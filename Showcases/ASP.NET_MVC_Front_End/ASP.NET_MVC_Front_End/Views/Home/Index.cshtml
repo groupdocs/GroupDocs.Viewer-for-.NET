@@ -1,0 +1,107 @@
+﻿@using MvcSample.Helpers
+<h2 style="text-align: center">GroupDocs.Viewer for .NET Sample</h2>
+<table>
+    <tr>
+        <td style="text-align: center">
+            <h4>View document in HTML mode</h4>
+        </td>
+        <td></td>
+        <td style="text-align: center">
+            <h4>View document in image mode</h4>
+        </td>
+     </tr>
+    <tr>
+        <td>
+            <div id="viewerHtmlDiv"></div>
+        </td>
+        <td style="width:30px"></td>
+        <td>
+            <div id="viewerImageDiv"></div>
+        </td>
+    </tr>
+</table>
+
+@section scripts{
+    <script>
+        $(function () {
+            var viewerSyle = {
+                ScrollView: 1,
+                DoublePageFlip: 2,
+                OnePageInRow: 3,
+                TwoPagesInRow: 4,
+                CoverThenTwoPagesInRow: 5
+            };
+            var localizedStrings = @LocalizationHelper.GetLocalizedStringsJson(Locales.ArAe)
+
+            $('#viewerHtmlDiv').groupdocsViewer({
+                //filePath: 'http://groupdocs.com/images/banner/carousel2/signature.png',
+                filePath: 'demo.docx',
+                //filePath: 'ProcessFileFromStreamExample_1.pdf',
+                //filePath: 'ProcessFileFromStreamExample_2.doc',
+                zoomToFitWidth: false,
+                showZoom: true,
+                zoomToFitHeight: true,
+                showFolderBrowser: true,
+                showHeader: true,
+                showPaging: true,
+                width: 650,
+                height: 900,
+                watermarkPosition: 'Diagonal',
+                watermarkText: '透かし文字、Watermark for Html',
+                watermarkColor: 16711680,
+                watermarkOpacity: 255,
+                useHtmlBasedEngine: true,
+                showDocumentNavigation: true,
+                showDownload: true,
+                downloadPdfFile: true,
+                showPrint: true,
+                usePdfPrinting: true,
+                printWithWatermark: true,
+                enableStandardErrorHandling: false,
+                preloadPagesCount: 1,
+                viewerStyle: viewerSyle.ScrollView, //Layout type
+                localizedStrings: localizedStrings,
+            });
+
+            EnableRightClickMenu = false;
+            $('#viewerHtmlDiv')[0].oncontextmenu = function () { return EnableRightClickMenu; };
+        });
+
+        $(function () {
+            $('#viewerImageDiv').groupdocsViewer({
+                filePath: 'demo.docx',
+                //filePath: 'http://www2.ensc.sfu.ca/grad/theses/tips/Effective_presentation.ppt',
+                //zoomToFitWidth: true,
+                zoomToFitHeight: true,
+                showFolderBrowser: true,
+                showZoom: true,
+                showHeader: true,
+                showPaging: true,
+                width: 650,
+                height: 900,
+                quality:100,
+                watermarkPosition: 'Diagonal',
+                watermarkText: '透かし文字、Watermark for image',
+                watermarkColor: 897656,
+                watermarkOpacity:50,
+                showDocumentNavigation: true,
+                useHtmlBasedEngine: false,
+                showDownload: true,
+                downloadPdfFile: false,
+                showPrint: true,
+                usePdfPrinting: true,
+                printWithWatermark :true,
+                supportPageRotation: true,
+                showThumbnails: true,
+                openThumbnails: true,
+                supportPageReordering: true,
+                enableStandardErrorHandling: true,
+                showSearch: true,
+                supportTextSelection: true,
+
+            });
+            EnableRightClickMenu = false;
+            $('#viewerImageDiv')[0].oncontextmenu = function () { return EnableRightClickMenu; };
+        });
+    </script>
+}

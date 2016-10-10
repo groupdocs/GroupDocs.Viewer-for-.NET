@@ -26,7 +26,6 @@ namespace GroupDocs.Viewer.Examples
         #region Configurations
 
 
-
         /// <summary>
         /// Initialize, populate and return the ViewerConfig object
         /// </summary>
@@ -44,7 +43,25 @@ namespace GroupDocs.Viewer.Examples
 
         }
 
+        /// <summary>
+        /// Initialize, populate and return the ViewerConfig object
+        /// </summary>
+        /// <param name="DefaultFontName">Font Name</param>
+        /// <returns>Populated ViewerConfig Object</returns>
+        public static ViewerConfig GetConfigurations(string DefaultFontName)
+        {
+            //ExStart:ConfigurationsWithDefaultFontName
+            ViewerConfig config = new ViewerConfig();
+            //set the storage path
+            config.StoragePath = StoragePath;
+            //Uncomment the below line for cache purpose
+            //config.UseCache = true;
+            //Set default font name
+            config.DefaultFontName = DefaultFontName;
+            return config;
+            //ExEnd:ConfigurationsWithDefaultFontName
 
+        }
 
 
 
@@ -130,6 +147,8 @@ namespace GroupDocs.Viewer.Examples
                 watermark.Position = position;
                 //set an integer value as watermark width 
                 watermark.Width = width;
+                // Set font name
+                watermark.FontName = "MS Gothic";
                 //Assign intialized and populated watermark object to ImageOptions or HtmlOptions objects
                 options.Watermark = watermark;
                 //ExEnd:AddWatermark
@@ -149,7 +168,10 @@ namespace GroupDocs.Viewer.Examples
                 watermark.Color = color;
                 watermark.Position = position;
                 watermark.Width = width;
-                options.Watermark = watermark;
+                watermark.FontName = "\"Comic Sans MS\", cursive, sans-serif";
+                options.Watermark = watermark; 
+               
+
             }
 
         }
@@ -215,6 +237,48 @@ namespace GroupDocs.Viewer.Examples
                 Console.WriteLine(ex.Message);
             }
         }
+        /// <summary>
+        /// Get document stream
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param> 
+        public static Stream GetDocumentStream(string DocumentName)
+        {
+            try
+            {
+                //ExStart:GetDocumentStream
+                FileStream fsSource = new FileStream(StoragePath + DocumentName,
+                     FileMode.Open, FileAccess.Read);
+
+                // Read the source file into a byte array.
+                byte[] bytes = new byte[fsSource.Length];
+                int numBytesToRead = (int)fsSource.Length;
+                int numBytesRead = 0;
+                while (numBytesToRead > 0)
+                {
+                    // Read may return anything from 0 to numBytesToRead.
+                    int n = fsSource.Read(bytes, numBytesRead, numBytesToRead);
+
+                    // Break when the end of the file is reached.
+                    if (n == 0)
+                        break;
+
+                    numBytesRead += n;
+                    numBytesToRead -= n;
+                }
+                numBytesToRead = bytes.Length;
+
+                return fsSource;
+
+
+                //ExEnd:GetDocumentStream
+            }
+            catch (FileNotFoundException ioEx)
+            {
+                Console.WriteLine(ioEx.Message);
+                return null;
+            }
+        }
+
         /// <summary>
         /// Save file in any format
         /// </summary>

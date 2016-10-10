@@ -27,7 +27,6 @@ Namespace GroupDocs.Viewer.Examples
 #Region "Configurations"
 
 
-
         ''' <summary>
         ''' Initialize, populate and return the ViewerConfig object
         ''' </summary>
@@ -44,7 +43,24 @@ Namespace GroupDocs.Viewer.Examples
 
         End Function
 
+        ''' <summary>
+        ''' Initialize, populate and return the ViewerConfig object
+        ''' </summary>
+        ''' <param name="DefaultFontName">Font Name</param>
+        ''' <returns>Populated ViewerConfig Object</returns>
+        Public Shared Function GetConfigurations(DefaultFontName As String) As ViewerConfig
+            'ExStart:ConfigurationsWithDefaultFontName
+            Dim config As New ViewerConfig()
+            'set the storage path
+            config.StoragePath = StoragePath
+            'Uncomment the below line for cache purpose
+            'config.UseCache = true;
+            'Set default font name
+            config.DefaultFontName = DefaultFontName
+            Return config
+            'ExEnd:ConfigurationsWithDefaultFontName
 
+        End Function
 
 
 
@@ -131,6 +147,8 @@ Namespace GroupDocs.Viewer.Examples
                 watermark.Position = position
                 'set an integer value as watermark width 
                 watermark.Width = width
+                ' Set font name
+                watermark.FontName = "MS Gothic"
                 'Assign intialized and populated watermark object to ImageOptions or HtmlOptions objects
                 options.Watermark = watermark
                 'ExEnd:AddWatermark
@@ -149,6 +167,7 @@ Namespace GroupDocs.Viewer.Examples
                 watermark.Color = color
                 watermark.Position = position
                 watermark.Width = width
+                watermark.FontName = """Comic Sans MS"", cursive, sans-serif"
                 options.Watermark = watermark
             End Sub
 
@@ -256,7 +275,42 @@ Namespace GroupDocs.Viewer.Examples
             'ExEnd:LoadFioleTree
 
         End Sub
+        ''' <summary>
+        ''' Get document stream
+        ''' </summary>
+        ''' <param name="DocumentName">Input document name</param> 
+        Public Shared Function GetDocumentStream(DocumentName As String) As Stream
+            Try
+                'ExStart:GetDocumentStream
+                Dim fsSource As New FileStream(StoragePath & DocumentName, FileMode.Open, FileAccess.Read)
 
+                ' Read the source file into a byte array.
+                Dim bytes As Byte() = New Byte(fsSource.Length - 1) {}
+                Dim numBytesToRead As Integer = CInt(fsSource.Length)
+                Dim numBytesRead As Integer = 0
+                While numBytesToRead > 0
+                    ' Read may return anything from 0 to numBytesToRead.
+                    Dim n As Integer = fsSource.Read(bytes, numBytesRead, numBytesToRead)
+
+                    ' Break when the end of the file is reached.
+                    If n = 0 Then
+                        Exit While
+                    End If
+
+                    numBytesRead += n
+                    numBytesToRead -= n
+                End While
+                numBytesToRead = bytes.Length
+
+
+
+                'ExEnd:GetDocumentStream
+                Return fsSource
+            Catch ioEx As FileNotFoundException
+                Console.WriteLine(ioEx.Message)
+                Return Nothing
+            End Try
+        End Function
 #End Region
     End Class
 

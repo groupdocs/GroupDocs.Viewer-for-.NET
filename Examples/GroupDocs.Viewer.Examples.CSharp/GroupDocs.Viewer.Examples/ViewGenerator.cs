@@ -19,35 +19,37 @@ namespace GroupDocs.Viewer.Examples.CSharp
 {
     public static class ViewGenerator
     {
-       
+
+
         #region HTMLRepresentation
         /// <summary>
         /// Render simple document in html representation
         /// </summary>
         /// <param name="DocumentName">File name</param>
         /// <param name="DocumentPassword">Optional</param>
-        public static void RenderDocumentAsHtml(String DocumentName,String DocumentPassword=null)
+        public static void RenderDocumentAsHtml(String DocumentName, String DocumentPassword = null)
         {
-           //ExStart:RenderAsHtml
+            //ExStart:RenderAsHtml
             //Get Configurations
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Create html handler
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
-            
+
             // Guid implies that unique document name 
             string guid = DocumentName;
 
             //Instantiate the HtmlOptions object
             HtmlOptions options = new HtmlOptions();
-            
+
             //to get html representations of pages with embedded resources
             options.IsResourcesEmbedded = true;
 
             // Set password if document is password protected. 
-            if(!String.IsNullOrEmpty(DocumentPassword))
-            options.Password = DocumentPassword;
-          //  options.PageNumbersToConvert = Enumerable.Range(1, 3).ToList();
+            if (!String.IsNullOrEmpty(DocumentPassword))
+                options.Password = DocumentPassword;
+            //options.PageNumbersToConvert = Enumerable.Range(1, 3).ToList();
+
             //Get document pages in html form
             List<PageHtml> pages = htmlHandler.GetPages(guid, options);
 
@@ -89,7 +91,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Call AddWatermark and pass the reference of HtmlOptions object as 1st parameter
             Utilities.PageTransformations.AddWatermark(ref options, WatermarkText, WatermarkColor, position, WatermarkWidth);
-            
+
             //Get document pages in html form
             List<PageHtml> pages = htmlHandler.GetPages(guid, options);
 
@@ -120,22 +122,22 @@ namespace GroupDocs.Viewer.Examples.CSharp
             string guid = DocumentName;
 
             //Instantiate the HtmlOptions object with setting of Reorder Transformation
-            HtmlOptions options = new HtmlOptions {  Transformations=Transformation.Reorder };
+            HtmlOptions options = new HtmlOptions { Transformations = Transformation.Reorder };
 
             //to get html representations of pages with embedded resources
             options.IsResourcesEmbedded = true;
-            
+
             // Set password if document is password protected. 
-             if (!String.IsNullOrEmpty(DocumentPassword))
+            if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
-           
+
             //Call ReorderPage and pass the reference of ViewerHandler's class  parameter by reference. 
             Utilities.PageTransformations.ReorderPage(ref handler, guid, CurrentPageNumber, NewPageNumber);
-            
+
             //down cast the handler(ViewerHandler) to viewerHtmlHandler
             ViewerHtmlHandler htmlHandler = (ViewerHtmlHandler)handler;
 
-           //Get document pages in html form
+            //Get document pages in html form
             List<PageHtml> pages = htmlHandler.GetPages(guid, options);
 
             foreach (PageHtml page in pages)
@@ -153,21 +155,21 @@ namespace GroupDocs.Viewer.Examples.CSharp
         public static void RenderDocumentAsHtml(Uri DocumentURL, String DocumentPassword = null)
         {
             //ExStart:RenderRemoteDocAsHtml
-           //Get Configurations 
+            //Get Configurations 
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Create html handler
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
 
-           //Instantiate the HtmlOptions object
+            //Instantiate the HtmlOptions object
             HtmlOptions options = new HtmlOptions();
 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
-            
+
             //Get document pages in html form
-            List<PageHtml> pages = htmlHandler.GetPages(DocumentURL,options);
-            
+            List<PageHtml> pages = htmlHandler.GetPages(DocumentURL, options);
+
             foreach (PageHtml page in pages)
             {
                 //Save each page at disk
@@ -199,7 +201,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
             //Get Pre Render info
-            int allPages = htmlHandler.GetDocumentInfo(new DocumentInfoOptions(guid)).Pages.Count;
+            int allPages = htmlHandler.GetDocumentInfo(guid).Pages.Count;
 
             int pageNumber = 1;
 
@@ -237,6 +239,115 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             //ExEnd:RenderAsHtml
         }
+
+        /// <summary>
+        /// Render a document in html representation with specifying resource prefix.
+        /// </summary>
+        /// <param name="DocumentName">file/document name</param>
+        public static void RenderDocumentAsHtmlWithResourcePrefix(string DocumentName)
+        {
+            //ExStart:RenderDocumentAsHtmlWithResourcePrefix
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            //Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            //Guid implies that unique document name 
+            string guid = DocumentName;
+
+            //Instantiate the HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            //To get html representations of pages with embedded resources
+            options.IsResourcesEmbedded = false;
+
+            //Set resource prefix
+            options.HtmlResourcePrefix = "http://contoso.com/api/getResource?name=";
+
+            //To ignore resource prefix in CSS 
+            //options.IgnoreResourcePrefixForCss = true;
+
+            //Get document pages in html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderDocumentAsHtmlWithResourcePrefix
+
+
+        }
+
+        /// <summary>
+        /// Render hidden pages of Visio file as Html.
+        /// </summary>
+        /// <param name="DocumentName">file/document name</param>
+        public static void RenderHiddenPagesOfVisioAsHtml(string DocumentName)
+        {
+            //ExStart:RenderHiddenPagesInVisioAsHtml
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+            string guid = DocumentName;
+
+            // Set html options to show grid lines
+            HtmlOptions options = new HtmlOptions();
+            options.DiagramOptions.ShowHiddenPages = true;
+
+            DocumentInfoContainer container = htmlHandler.GetDocumentInfo(guid);
+
+            foreach (PageData page in container.Pages)
+                Console.WriteLine("Page number: {0}, Page Name: {1}, IsVisible: {2}", page.Number, page.Name, page.IsVisible);
+
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderHiddenPagesInVisioAsHtml
+
+
+        }
+
+        /// <summary>
+        /// Render Excel file as Html with internal hyperlink prefix.
+        /// </summary>
+        /// <param name="DocumentName">file/document name</param>
+        public static void RenderExcelAsHtmlWithInternalHyperlinkPrefix(string DocumentName)
+        {
+
+            //ExStart:RenderExcelAsHtmlWithInternalHyperlinkPrefix
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+            string guid = DocumentName;
+
+            // Set html options to show grid lines
+            HtmlOptions options = new HtmlOptions();
+            options.CellsOptions.InternalHyperlinkPrefix = "http://contoso.com/api/getPage?name=";
+
+            //InternalHyperlinkPrefix value may contain page number placeholder which will be substituted with referenced sheet number.
+            options.CellsOptions.InternalHyperlinkPrefix = "http://contoso.com/api/getPage?number={page-number}";
+
+            DocumentInfoContainer container = htmlHandler.GetDocumentInfo(guid);
+
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderExcelAsHtmlWithInternalHyperlinkPrefix
+
+        }
         #endregion
 
         #region ImageRepresentation
@@ -245,7 +356,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
         /// </summary>
         /// <param name="DocumentName">File name</param>
         /// <param name="DocumentPassword">Optional</param>
-        public static void RenderDocumentAsImages(String DocumentName,String DocumentPassword=null)
+        public static void RenderDocumentAsImages(String DocumentName, String DocumentPassword = null)
         {
             //ExStart:RenderAsImage
             //Get Configurations
@@ -253,10 +364,10 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Create image handler 
             ViewerImageHandler imageHandler = new ViewerImageHandler(config);
-            
+
             // Guid implies that unique document name 
             string guid = DocumentName;
-            
+
             //Initialize ImageOptions Object
             ImageOptions options = new ImageOptions();
 
@@ -264,9 +375,12 @@ namespace GroupDocs.Viewer.Examples.CSharp
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
 
+            // Set one page per sheet option to false for Multiple pages per sheet in Excel documents, default value of this option is true
+            // options.CellsOptions.OnePagePerSheet = false;
+
             //Get document pages in image form
             List<PageImage> Images = imageHandler.GetPages(guid, options);
-          
+
             foreach (PageImage image in Images)
             {
                 //Save each image at disk
@@ -302,10 +416,10 @@ namespace GroupDocs.Viewer.Examples.CSharp
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
-           
+
             // Call AddWatermark and pass the reference of ImageOptions object as 1st parameter
             Utilities.PageTransformations.AddWatermark(ref options, WatermarkText, WatermarkColor, position, WatermarkWidth);
-            
+
             //Get document pages in image form
             List<PageImage> Images = imageHandler.GetPages(guid, options);
 
@@ -333,20 +447,20 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Guid implies that unique document name 
             string guid = DocumentName;
-           
+
             //Initialize ImageOptions Object and setting Rotate Transformation
-            ImageOptions options = new ImageOptions { Transformations=Transformation.Rotate  };
+            ImageOptions options = new ImageOptions { Transformations = Transformation.Rotate };
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
 
             //Call RotatePages to apply rotate transformation to a page
-            Utilities.PageTransformations.RotatePages(ref handler, guid,1,RotationAngle);
+            Utilities.PageTransformations.RotatePages(ref handler, guid, 1, RotationAngle);
 
             //down cast the handler(ViewerHandler) to viewerHtmlHandler
             ViewerImageHandler imageHandler = (ViewerImageHandler)handler;
-            
+
             //Get document pages in image form
             List<PageImage> Images = imageHandler.GetPages(guid, options);
 
@@ -372,23 +486,23 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Cast ViewerHtmlHandler class object to its base class(ViewerHandler).
             ViewerHandler<PageImage> handler = new ViewerImageHandler(config);
-            
+
             // Guid implies that unique document name 
             string guid = DocumentName;
 
             //Initialize ImageOptions Object and setting Reorder Transformation
-            ImageOptions options = new ImageOptions  {  Transformations=Transformation.Reorder  };
+            ImageOptions options = new ImageOptions { Transformations = Transformation.Reorder };
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
-           
+
             //Call ReorderPage and pass the reference of ViewerHandler's class  parameter by reference. 
-            Utilities.PageTransformations.ReorderPage(ref handler,guid,CurrentPageNumber,NewPageNumber);
-           
+            Utilities.PageTransformations.ReorderPage(ref handler, guid, CurrentPageNumber, NewPageNumber);
+
             //down cast the handler(ViewerHandler) to viewerHtmlHandler
             ViewerImageHandler imageHandler = (ViewerImageHandler)handler;
-            
+
             //Get document pages in image form
             List<PageImage> Images = imageHandler.GetPages(guid, options);
 
@@ -412,14 +526,14 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Create image handler
             ViewerImageHandler imageHandler = new ViewerImageHandler(config);
-                                  
+
             //Initialize ImageOptions Object
             ImageOptions options = new ImageOptions();
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
-           
+
             //Get document pages in image form
             List<PageImage> Images = imageHandler.GetPages(DocumentURL, options);
 
@@ -429,6 +543,41 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 Utilities.SaveAsImage(image.PageNumber + "_" + Path.GetFileName(DocumentURL.LocalPath), image.Stream);
             }
             //ExEnd:RenderRemoteDocAsImages
+        }
+
+        /// <summary>
+        /// Render hidden pages of Visio file as image.
+        /// </summary>
+        /// <param name="DocumentName">file/document name</param>
+        public static void RenderHiddenPagesOfVisioAsImage(string DocumentName)
+        {
+
+            //ExStart:RenderHiddenPagesOfVisioAsImage
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create image handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+            string guid = DocumentName;
+
+            // Set image options to show hidden pages
+            ImageOptions options = new ImageOptions();
+            options.DiagramOptions.ShowHiddenPages = true;
+
+            DocumentInfoContainer container = imageHandler.GetDocumentInfo(guid);
+
+            foreach (PageData page in container.Pages)
+                Console.WriteLine("Page number: {0}, Page Name: {1}, IsVisible: {2}", page.Number, page.Name, page.IsVisible);
+
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                //Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:RenderHiddenPagesOfVisioAsImage
+
+
         }
 
         #endregion
@@ -443,45 +592,117 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //ExStart:RenderOriginal
             // Create image handler 
             ViewerImageHandler imageHandler = new ViewerImageHandler(Utilities.GetConfigurations());
-            
-           // Guid implies that unique document name 
+
+            // Guid implies that unique document name 
             string guid = DocumentName;
 
             // Get original file
             FileContainer container = imageHandler.GetFile(guid);
-           
+
             //Save each image at disk
             Utilities.SaveAsImage(DocumentName, container.Stream);
             //ExEnd:RenderOriginal
 
         }
-       /// <summary>
-       /// Render a document in PDF Form
-       /// </summary>
-       /// <param name="DocumentName"></param>
+        /// <summary>
+        /// Render a document in PDF Form
+        /// </summary>
+        /// <param name="DocumentName"></param>
         public static void RenderDocumentAsPDF(String DocumentName)
         {
             //ExStart:RenderAsPdf
             // Create/initialize image handler 
             ViewerImageHandler imageHandler = new ViewerImageHandler(Utilities.GetConfigurations());
 
-           //Initialize PdfFileOptions object
-            PdfFileOptions options = new PdfFileOptions();
-           
-            // Guid implies that unique document name 
-            options.Guid = DocumentName;
-            
+            // To Apply transformations on PDF file
+            // options.Transformations = Transformation.Rotate | Transformation.Reorder | Transformation.AddPrintAction;
+
             // Call GetPdfFile to get FileContainer type object which contains the stream of pdf file.
-            FileContainer container = imageHandler.GetPdfFile(options);
-           
+            FileContainer container = imageHandler.GetPdfFile(DocumentName);
+
             //Change the extension of the file and assign to a string type variable filename
-            String filename=Path.GetFileNameWithoutExtension(DocumentName)+".pdf";
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
             //Save each image at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderAsPdf
 
         }
+
+        /// <summary>
+        /// Render a document in PDF Form with watermark 
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        /// <param name="WatermarkText"></param>
+        public static void RenderDocumentAsPDF(String DocumentName, String WatermarkText)
+        {
+            //ExStart:RenderAsPdf
+            // Create/initialize image handler 
+            ViewerImageHandler imageHandler = new ViewerImageHandler(Utilities.GetConfigurations());
+
+            // Set watermark properties
+            Watermark watermark = new Watermark(WatermarkText);
+            watermark.Color = System.Drawing.Color.Blue;
+            watermark.Position = WatermarkPosition.Diagonal;
+            watermark.Width = 100;
+
+            PdfFileOptions options = new PdfFileOptions();
+            options.Watermark = watermark;
+
+            // To Apply transformations on PDF file
+            // options.Transformations = Transformation.Rotate | Transformation.Reorder | Transformation.AddPrintAction;
+
+            // Call GetPdfFile to get FileContainer type object which contains the stream of pdf file.
+            FileContainer container = imageHandler.GetPdfFile(DocumentName, options);
+
+            //Change the extension of the file and assign to a string type variable filename
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save each image at disk
+            Utilities.SaveFile(filename, container.Stream);
+            //ExEnd:RenderAsPdf
+
+        }
+
+        /// <summary>
+        /// Render a document in PDF Form with watermark 
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        /// <param name="WatermarkText"></param>
+        /// <param name="WatermarkFontName"></param>
+        public static void RenderDocumentAsPDF(String DocumentName, String WatermarkText, String WatermarkFontName = "MS Gothic")
+        {
+            //ExStart:RenderAsPdf
+            // Create/initialize image handler 
+            ViewerImageHandler imageHandler = new ViewerImageHandler(Utilities.GetConfigurations());
+
+            // Set watermark properties
+            Watermark watermark = new Watermark(WatermarkText);
+            watermark.Color = System.Drawing.Color.Blue;
+            watermark.Position = WatermarkPosition.Diagonal;
+            watermark.Width = 100;
+
+            // Set watermark font name which contains Japanese characters
+            watermark.FontName = WatermarkFontName;
+
+            PdfFileOptions options = new PdfFileOptions();
+            options.Watermark = watermark;
+
+            // To Apply transformations on PDF file
+            // options.Transformations = Transformation.Rotate | Transformation.Reorder | Transformation.AddPrintAction;
+
+            // Call GetPdfFile to get FileContainer type object which contains the stream of pdf file.
+            FileContainer container = imageHandler.GetPdfFile(DocumentName, options);
+
+            //Change the extension of the file and assign to a string type variable filename
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save each image at disk
+            Utilities.SaveFile(filename, container.Stream);
+            //ExEnd:RenderAsPdf
+
+        }
+
         /// <summary>
         /// Load directory structure as file tree
         /// </summary>
@@ -495,7 +716,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             // Load file tree list for custom path 
             var options = new FileTreeOptions(Path);
 
-           // Load file tree list for ViewerConfig.StoragePath
+            // Load file tree list for ViewerConfig.StoragePath
             FileTreeContainer container = imageHandler.LoadFileTree(options);
 
             foreach (var node in container.FileTree)
@@ -523,6 +744,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
         }
         #endregion
 
+
         #region InputDataHandlers
 
         /// <summary>
@@ -533,13 +755,13 @@ namespace GroupDocs.Viewer.Examples.CSharp
         {
             // Setup GroupDocs.Viewer config
             ViewerConfig config = Utilities.GetConfigurations();
-           
+
 
             // File guid
             string guid = DocumentName;
 
             // Use custom IInputDataHandler implementation
-            IInputDataHandler inputDataHandler = new AzureInputDataHandler("<Account_Name>","<Account_Key>","<Container_Name>");
+            IInputDataHandler inputDataHandler = new AzureInputDataHandler("<Account_Name>", "<Account_Key>", "<Container_Name>");
 
             // Get file HTML representation
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config, inputDataHandler);
@@ -559,13 +781,13 @@ namespace GroupDocs.Viewer.Examples.CSharp
         {
             // Setup GroupDocs.Viewer config
             ViewerConfig config = Utilities.GetConfigurations();
-           
+
             // File guid
             string guid = DocumentName;
 
             // Use custom IInputDataHandler implementation
             IInputDataHandler inputDataHandler = new FtpInputDataHandler();
-            
+
             // Get file HTML representation
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config, inputDataHandler);
 
@@ -578,18 +800,358 @@ namespace GroupDocs.Viewer.Examples.CSharp
         }
         #endregion
 
+        #region OtherOperations
+        /// <summary>
+        /// Set custom fonts directory path
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void SetCustomFontDirectory(String DocumentName)
+        {
+            try
+            {
+                //ExStart:SetCustomFontDirectory
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Add custom fonts directories to FontDirectories list
+                config.FontDirectories.Add(@"/usr/admin/Fonts");
+                config.FontDirectories.Add(@"/home/admin/Fonts");
+
+                ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+                // File guid
+                string guid = DocumentName;
+
+                List<PageHtml> pages = htmlHandler.GetPages(guid);
+
+                foreach (PageHtml page in pages)
+                {
+                    //Save each page at disk
+                    Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+                }
+                //ExEnd:SetCustomFontDirectory
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+        #endregion
+
+        #region EmailAttachments
+        /// <summary>
+        /// Get attached image with email message
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetEmailAttachments(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetEmailAttachments
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler handler = new ViewerImageHandler(config);
+                EmailAttachment attachment = new EmailAttachment(DocumentName, "attachment-image.png");
+
+                // Get attachment original file
+                FileContainer container = handler.GetFile(attachment);
+
+                Console.WriteLine("Attach name: {0}, Type: {1}", attachment.Name, attachment.FileType);
+                Console.WriteLine("Attach stream lenght: {0}", container.Stream.Length);
+                //ExEnd:GetEmailAttachments
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get attached file's html representation
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetEmailAttachmentHTMLRepresentation(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetEmailAttachmentHTMLRepresentation
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Setup html conversion options
+                HtmlOptions htmlOptions = new HtmlOptions();
+                htmlOptions.IsResourcesEmbedded = false;
+
+                // Init viewer html handler
+                ViewerHtmlHandler handler = new ViewerHtmlHandler(config);
+
+                DocumentInfoContainer info = handler.GetDocumentInfo(DocumentName);
+
+                // Iterate over the attachments collection
+                foreach (AttachmentBase attachment in info.Attachments)
+                {
+                    Console.WriteLine("Attach name: {0}, size: {1}", attachment.Name, attachment.FileType);
+
+                    // Get attachment document html representation
+                    List<PageHtml> pages = handler.GetPages(attachment, htmlOptions);
+                    foreach (PageHtml page in pages)
+                    {
+                        Console.WriteLine("  Page: {0}, size: {1}", page.PageNumber, page.HtmlContent.Length);
+                        foreach (HtmlResource htmlResource in page.HtmlResources)
+                        {
+                            Stream resourceStream = handler.GetResource(attachment, htmlResource);
+                            Console.WriteLine("     Resource: {0}, size: {1}", htmlResource.ResourceName, resourceStream.Length);
+                        }
+                    }
+                }
+                //ExEnd:GetEmailAttachmentHTMLRepresentation
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get attached file's image representation
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetEmailAttachmentImageRepresentation(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetEmailAttachmentImageRepresentation
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Init viewer image handler
+                ViewerImageHandler handler = new ViewerImageHandler(config);
+
+                DocumentInfoContainer info = handler.GetDocumentInfo(DocumentName);
+
+                // Iterate over the attachments collection
+                foreach (AttachmentBase attachment in info.Attachments)
+                {
+                    Console.WriteLine("Attach name: {0}, size: {1}", attachment.Name, attachment.FileType);
+
+                    // Get attachment document image representation
+                    List<PageImage> pages = handler.GetPages(attachment);
+                    foreach (PageImage page in pages)
+                        Console.WriteLine("  Page: {0}, size: {1}", page.PageNumber, page.Stream.Length);
+                }
+                //ExEnd:GetEmailAttachmentImageRepresentation
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+        #endregion
+
+        #region DocumentInformation
+        /// <summary>
+        /// Get document information by guid
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetDocumentInfoByGuid(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetDocumentInfoByGuid
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create html handler
+                ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+                string guid = DocumentName;
+                // Get document information
+                DocumentInfoOptions options = new DocumentInfoOptions();
+                DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(guid, options);
+
+                Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
+                Console.WriteLine("DocumentType: {0}", documentInfo.DocumentType);
+                Console.WriteLine("DocumentTypeFormat: {0}", documentInfo.DocumentTypeFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
+                Console.WriteLine("FileType: {0}", documentInfo.FileType);
+                Console.WriteLine("Guid: {0}", documentInfo.Guid);
+                Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
+                Console.WriteLine("Name: {0}", documentInfo.Name);
+                Console.WriteLine("PageCount: {0}", documentInfo.Pages.Count);
+                Console.WriteLine("Size: {0}", documentInfo.Size);
+
+                foreach (PageData pageData in documentInfo.Pages)
+                {
+                    Console.WriteLine("Page number: {0}", pageData.Number);
+                    Console.WriteLine("Page name: {0}", pageData.Name);
+                }
+                //ExEnd:GetDocumentInfoByGuid
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get document information by Uri
+        /// </summary>
+        /// <param name="Uri">Uri of input document</param>
+        public static void GetDocumentInfoByUri(String Uri)
+        {
+            try
+            {
+                //ExStart:GetDocumentInfoByUri
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create html handler
+                ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+                Uri uri = new Uri(Uri);
+
+                // Get document information
+                DocumentInfoOptions options = new DocumentInfoOptions();
+                DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(uri, options);
+
+                Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
+                Console.WriteLine("DocumentType: {0}", documentInfo.DocumentType);
+                Console.WriteLine("DocumentTypeFormat: {0}", documentInfo.DocumentTypeFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
+                Console.WriteLine("FileType: {0}", documentInfo.FileType);
+                Console.WriteLine("Guid: {0}", documentInfo.Guid);
+                Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
+                Console.WriteLine("Name: {0}", documentInfo.Name);
+                Console.WriteLine("PageCount: {0}", documentInfo.Pages.Count);
+                Console.WriteLine("Size: {0}", documentInfo.Size);
+
+                foreach (PageData pageData in documentInfo.Pages)
+                {
+                    Console.WriteLine("Page number: {0}", pageData.Number);
+                    Console.WriteLine("Page name: {0}", pageData.Name);
+                }
+                //ExEnd:GetDocumentInfoByUri
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get document information by stream
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void GetDocumentInfoByStream(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetDocumentInfoByStream
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create html handler
+                ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+                // Get document stream
+                Stream stream = Utilities.GetDocumentStream(DocumentName);
+                // Get document information
+                DocumentInfoOptions options = new DocumentInfoOptions();
+                DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(stream, options);
+
+                Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
+                Console.WriteLine("DocumentType: {0}", documentInfo.DocumentType);
+                Console.WriteLine("DocumentTypeFormat: {0}", documentInfo.DocumentTypeFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
+                Console.WriteLine("FileType: {0}", documentInfo.FileType);
+                Console.WriteLine("Guid: {0}", documentInfo.Guid);
+                Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
+                Console.WriteLine("Name: {0}", documentInfo.Name);
+                Console.WriteLine("PageCount: {0}", documentInfo.Pages.Count);
+                Console.WriteLine("Size: {0}", documentInfo.Size);
+
+                foreach (PageData pageData in documentInfo.Pages)
+                {
+                    Console.WriteLine("Page number: {0}", pageData.Number);
+                    Console.WriteLine("Page name: {0}", pageData.Name);
+                }
+                stream.Close();
+                //ExEnd:GetDocumentInfoByStream
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+
+        #endregion
+
+        #region DocumentCache
+        /// <summary>
+        /// Remove cache files 
+        /// </summary>
+        public static void RemoveCacheFiles()
+        {
+            try
+            {
+                //ExStart:RemoveCacheFiles
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Init viewer image or html handler
+                ViewerHtmlHandler viewerImageHandler = new ViewerHtmlHandler(config);
+
+                //Clear all cache files 
+                viewerImageHandler.ClearCache();
+                //ExEnd:RemoveCacheFiles
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+        /// <summary>
+        /// Remove cache file older than specified date 
+        /// </summary>
+        public static void RemoveCacheFiles(TimeSpan OlderThanDays)
+        {
+            try
+            {
+                //ExStart:RemoveCacheFilesTimeSpan
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Init viewer image or html handler
+                ViewerImageHandler viewerImageHandler = new ViewerImageHandler(config);
+
+                //Clear files from cache older than specified time interval 
+                viewerImageHandler.ClearCache(OlderThanDays);
+                //ExEnd:RemoveCacheFilesTimeSpan
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        #endregion
+
+
         #region OtherImprovements
 
         /* Working from 3.2.0*/
-       /// <summary>
+        /// <summary>
         /// Show grid lines for Excel files in html representation
-       /// </summary>
-       /// <param name="DocumentName"></param>
+        /// </summary>
+        /// <param name="DocumentName"></param>
         public static void RenderWithGridLinesInExcel(String DocumentName)
         {
             // Setup GroupDocs.Viewer config
             ViewerConfig config = Utilities.GetConfigurations();
-           
+
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
 
             // File guid
@@ -616,25 +1178,24 @@ namespace GroupDocs.Viewer.Examples.CSharp
         {
             // Setup GroupDocs.Viewer config
             ViewerConfig config = Utilities.GetConfigurations();
-           
+
             // Create image or html handler
             ViewerImageHandler imageHandler = new ViewerImageHandler(config);
             string guid = DocumentName;
 
             // Set pdf file one page per sheet option to false, default value of this option is true
             PdfFileOptions pdfFileOptions = new PdfFileOptions();
-            pdfFileOptions.Guid = guid;
             pdfFileOptions.CellsOptions.OnePagePerSheet = false;
 
             //Get pdf file
-            FileContainer fileContainer = imageHandler.GetPdfFile(pdfFileOptions);
+            FileContainer fileContainer = imageHandler.GetPdfFile(DocumentName, pdfFileOptions);
 
             Utilities.SaveFile("test.pdf", fileContainer.Stream);
         }
         /// <summary>
         /// Get all supported document formats
         /// </summary>
-        
+
         public static void ShowAllSupportedFormats()
         {
             // Setup GroupDocs.Viewer config
@@ -691,14 +1252,14 @@ namespace GroupDocs.Viewer.Examples.CSharp
             config.LocalesPath = @"D:\from office working\for aspose\GroupDocsViewer\GroupDocs.Viewer.Examples\Data\Locale";
 
             CultureInfo cultureInfo = new CultureInfo("fr-FR");
-            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config, cultureInfo); 
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config, cultureInfo);
 
             // File guid
             string guid = DocumentName;
 
             // Set html options to show grid lines
             HtmlOptions options = new HtmlOptions();
-            
+
             List<PageHtml> pages = htmlHandler.GetPages(guid, options);
 
             foreach (PageHtml page in pages)
@@ -711,6 +1272,6 @@ namespace GroupDocs.Viewer.Examples.CSharp
         #endregion
     }
 
-    
-    
+
+
 }

@@ -119,7 +119,7 @@ namespace GroupDocs.Viewer.Model
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Create image handler
-            ViewerHandler handler = new ViewerHtmlHandler(config);
+            ViewerHandler<PageHtml> handler = new ViewerHtmlHandler(config);
 
             // Guid implies that unique document name 
             string guid = DocumentName;
@@ -167,7 +167,7 @@ namespace GroupDocs.Viewer.Model
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Cast ViewerHtmlHandler class object to its base class(ViewerHandler).
-            ViewerHandler handler = new ViewerHtmlHandler(config);
+            ViewerHandler<PageHtml> handler = new ViewerHtmlHandler(config);
 
             // Guid implies that unique document name 
             string guid = DocumentName;
@@ -350,7 +350,7 @@ namespace GroupDocs.Viewer.Model
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Create image handler
-            ViewerHandler handler = new ViewerImageHandler(config);
+            ViewerHandler<PageImage> handler = new ViewerImageHandler(config);
 
             // Guid implies that unique document name 
             string guid = DocumentName;
@@ -404,7 +404,7 @@ namespace GroupDocs.Viewer.Model
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Cast ViewerHtmlHandler class object to its base class(ViewerHandler).
-            ViewerHandler handler = new ViewerImageHandler(config);
+            ViewerHandler<PageImage> handler = new ViewerImageHandler(config);
             
             // Guid implies that unique document name 
             string guid = DocumentName;
@@ -513,11 +513,8 @@ namespace GroupDocs.Viewer.Model
            //Initialize PdfFileOptions object
             PdfFileOptions options = new PdfFileOptions();
            
-            // Guid implies that unique document name 
-            options.Guid = DocumentName;
-
             // Call GetPdfFile to get FileContainer type object which contains the stream of pdf file.
-            FileContainer container = imageHandler.GetPdfFile(options);
+            FileContainer container = imageHandler.GetPdfFile(DocumentName, options);
            
             //Change the extension of the file and assign to a string type variable filename
             String filename=Path.GetFileNameWithoutExtension(DocumentName)+".pdf";
