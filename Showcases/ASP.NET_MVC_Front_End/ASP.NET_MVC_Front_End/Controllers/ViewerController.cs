@@ -43,7 +43,7 @@ namespace MvcSample.Controllers
             var htmlConfig = new ViewerConfig
             {
                 StoragePath = _storagePath,
-                TempPath = _tempPath,
+                CachePath = _tempPath,
                 UseCache = true
             };
 
@@ -52,9 +52,8 @@ namespace MvcSample.Controllers
             var imageConfig = new ViewerConfig
             {
                 StoragePath = _storagePath,
-                TempPath = _tempPath,
-                UseCache = true,
-                UsePdf = _usePdfInImageEngine
+                CachePath = _tempPath,
+                UseCache = true
             };
 
             _imageHandler = new ViewerImageHandler(imageConfig);
@@ -356,10 +355,10 @@ namespace MvcSample.Controllers
                 var htmlOptions = new HtmlOptions
                 {
                     PageNumber = parameters.PageIndex + 1,
-                    CountPagesToConvert = 1,
+                    CountPagesToRender = 1,
                     IsResourcesEmbedded = false,
                     HtmlResourcePrefix = string.Format(
-                        "/document-viewer/GetResourceForHtml?documentPath={0}", parameters.Path) +
+                        "/document-viewer/GetResourceForHtml?documentPath={0}", HttpUtility.UrlEncode(parameters.Path)) +
                                          "&pageNumber={page-number}&resourceName=",
                     Watermark = Utils.GetWatermark(parameters.WatermarkText, parameters.WatermarkColor,
     parameters.WatermarkPosition, parameters.WatermarkWidth, parameters.WatermarkOpacity),
@@ -408,10 +407,11 @@ namespace MvcSample.Controllers
                     Watermark = Utils.GetWatermark(parameters.WatermarkText, parameters.WatermarkColor,
                     parameters.WatermarkPosition, parameters.WatermarkWidth, parameters.WatermarkOpacity),
                     Transformations = parameters.Rotate ? Transformation.Rotate : Transformation.None,
-                    CountPagesToConvert = 1,
+                    CountPagesToRender = 1,
                     PageNumber = pageNumber,
                     JpegQuality = parameters.Quality.GetValueOrDefault(),
-                    PageNumbersToConvert = new List<int>(new int[] { pageNumber })
+                    PageNumbersToRender = new List<int>(new int[] { pageNumber }),
+                    ExtractText = _usePdfInImageEngine
             };
 
                 if (parameters.Rotate && parameters.Width.HasValue)
@@ -456,10 +456,10 @@ namespace MvcSample.Controllers
              parameters.ResourceName.IndexOf("/", StringComparison.Ordinal) >= 0)
                     parameters.ResourceName = parameters.ResourceName.Replace("/", "");
 
-                var resource = new HtmlResource
+                var resource = new HtmlResource(parameters.ResourceName)
                 {
-                    ResourceName = parameters.ResourceName,
-                    ResourceType = Utils.GetResourceType(parameters.ResourceName),
+                    //ResourceName = parameters.ResourceName,
+                    //ResourceType = Utils.GetResourceType(parameters.ResourceName),
                     DocumentPageNumber = parameters.PageNumber
                 };
                 var stream = _htmlHandler.GetResource(parameters.DocumentPath, resource);
@@ -488,9 +488,9 @@ namespace MvcSample.Controllers
                 DocumentInfoContainer documentInfoContainer = _imageHandler.GetDocumentInfo(guid);
                 int pageNumber = documentInfoContainer.Pages[pageIndex].Number;
 
-                RotatePageOptions rotatePageOptions = new RotatePageOptions(guid, pageNumber, parameters.RotationAmount);
+                RotatePageOptions rotatePageOptions = new RotatePageOptions( pageNumber, parameters.RotationAmount);
 
-                _imageHandler.RotatePage(rotatePageOptions);
+                _imageHandler.RotatePage(guid, rotatePageOptions);
                 DocumentInfoContainer container = _imageHandler.GetDocumentInfo(guid);
 
                 PageData pageData = container.Pages.Single(_ => _.Number == pageNumber);
@@ -521,8 +521,8 @@ namespace MvcSample.Controllers
                 int pageNumber = documentInfoContainer.Pages[parameters.OldPosition].Number;
                 int newPosition = parameters.NewPosition + 1;
 
-                ReorderPageOptions reorderPageOptions = new ReorderPageOptions(guid, pageNumber, newPosition);
-                _imageHandler.ReorderPage(reorderPageOptions);
+                ReorderPageOptions reorderPageOptions = new ReorderPageOptions( pageNumber, newPosition);
+                _imageHandler.ReorderPage(guid,reorderPageOptions);
 
                 return ToJsonResult(new ReorderPageResponse());
 
@@ -550,7 +550,18 @@ namespace MvcSample.Controllers
                 var indexOfBodyCloseTag = page.HtmlContent.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
                 if (indexOfBodyCloseTag > 0)
                     page.HtmlContent = page.HtmlContent.Substring(0, indexOfBodyCloseTag);
+                if (Path.GetExtension(filePath) == ".msg")
+                {
+                    foreach (var resource in page.HtmlResources.Where(_ => _.ResourceType == HtmlResourceType.Image))
+                    {
+                        string imagePath = string.Format("resources\\page{0}\\{1}",
+                            page.PageNumber, resource.ResourceName);
 
+                        page.HtmlContent = page.HtmlContent.Replace(resource.ResourceName,
+                            string.Format("/document-viewer/GetResourceForHtml?documentPath={0}&pageNumber={1}&resourceName={2}",
+                            filePath, page.PageNumber, resource.ResourceName));
+                    }
+                }
                 foreach (var resource in page.HtmlResources.Where(_ => _.ResourceType == HtmlResourceType.Style))
                 {
                     var cssStream = _htmlHandler.GetResource(filePath, resource);
@@ -575,12 +586,14 @@ namespace MvcSample.Controllers
                                 "url('/document-viewer/GetResourceForHtml?documentPath={0}&pageNumber={1}&resourceName=",
                                 filePath, page.PageNumber));
                     }
+                    // update path to image resource
+                  
 
                     cssList.Add(text);
 
                     if (needResave)
                     {
-                        var fullPath = Path.Combine(_tempPath, filePath, "html", "resources",
+                        var fullPath = Path.Combine(_tempPath, filePath.Replace('.', '_'), "html", "resources",
                             string.Format("page{0}", page.PageNumber), resource.ResourceName);
 
                         System.IO.File.WriteAllText(fullPath, text);
@@ -752,7 +765,7 @@ namespace MvcSample.Controllers
             {
                 IsResourcesEmbedded = false,
                 HtmlResourcePrefix = string.Format(
-                "/document-viewer/GetResourceForHtml?documentPath={0}", fileName) + "&pageNumber={page-number}&resourceName=",
+                "/document-viewer/GetResourceForHtml?documentPath={0}", HttpUtility.UrlEncode(fileName)) + "&pageNumber={page-number}&resourceName=",
                 Watermark = Utils.GetWatermark(request.WatermarkText, request.WatermarkColor,
 request.WatermarkPosition, request.WatermarkWidth, request.WatermarkOpacity),
             };
@@ -760,7 +773,7 @@ request.WatermarkPosition, request.WatermarkWidth, request.WatermarkOpacity),
             if (request.PreloadPagesCount.HasValue && request.PreloadPagesCount.Value > 0)
             {
                 htmlOptions.PageNumber = 1;
-                htmlOptions.CountPagesToConvert = request.PreloadPagesCount.Value;
+                htmlOptions.CountPagesToRender = request.PreloadPagesCount.Value;
             }
             /////
             List<string> cssList;
@@ -784,11 +797,18 @@ request.WatermarkPosition, request.WatermarkWidth, request.WatermarkOpacity),
                 htmlPages.AddRange(attachmentPages);
 
             }
-            /////
-            result.documentDescription = new FileDataJsonSerializer(fileData, new FileDataOptions()).Serialize(false);
+            SerializationOptions serializationOptions = new SerializationOptions
+            {
+                UsePdf = request.UsePdf,
+                SupportListOfBookmarks = request.SupportListOfBookmarks,
+                SupportListOfContentControls = request.SupportListOfContentControls
+            };
+
+            var documentInfoJson = new DocumentInfoJsonSerializer(docInfo, serializationOptions).Serialize();
+            result.documentDescription = documentInfoJson;
             result.docType = docInfo.DocumentType;
             result.fileType = docInfo.FileType;
-
+                
             result.pageHtml = htmlPages.Select(_ => _.HtmlContent).ToArray();
             result.pageCss = new[] { string.Join(" ", cssList) };
         }

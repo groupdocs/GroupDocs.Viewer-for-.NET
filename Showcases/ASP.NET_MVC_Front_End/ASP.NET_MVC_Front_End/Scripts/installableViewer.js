@@ -395,7 +395,8 @@
                     attachment = false;
                 });
             }
-            $("#"+settings.docViewerId+"").attachDragger();
+            if (settings.dragToScroll)
+                 $("#"+settings.docViewerId+"").attachDragger();
             this.groupdocsViewerWrapper = groupdocsViewerWrapper = container.find(".groupdocs_viewer_wrapper");
             var viewerHeader = this.viewerHeader = groupdocsViewerWrapper.find(".viewer_header");
             var viewerMainWrapper = this.viewerMainWrapper = groupdocsViewerWrapper.find(".viewer_mainwrapper");
@@ -546,7 +547,8 @@
                 searchIsVisible: settings.showSearch,
                 useRtl: settings.useRtl,
                 useAccentInsensitiveSearch: settings.useAccentInsensitiveSearch,
-                useVirtualScrolling: settings.useVirtualScrolling
+                useVirtualScrolling: settings.useVirtualScrolling,
+                searchText : settings.searchText
             };
 
             var thumbnailQuality;
@@ -613,7 +615,8 @@
                 saveFontsInAllFormats: settings.saveFontsInAllFormats,
                 downloadButtonMode: settings.downloadButtonMode,
                 allowDocumentDownloadingOnFailure: settings.allowDocumentDownloadingOnFailure,
-                printWithWatermark: settings.printWithWatermark
+                printWithWatermark: settings.printWithWatermark,
+                zoomPercent: settings.zoomPercent
             };
 
             var menuClickedEvent = "onMenuClicked";

@@ -34,8 +34,7 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
         private static ViewerHtmlHandler _htmlHandler;
         private static ViewerImageHandler _imageHandler;
         private static readonly Dictionary<string, Stream> _streams = new Dictionary<string, Stream>();
-
-        private static string _licensePath = @"";
+         
         private static string _storagePath = AppDomain.CurrentDomain.GetData("DataDirectory").ToString(); // App_Data folder path
         private static string _tempPath = AppDomain.CurrentDomain.GetData("DataDirectory") + "\\temp";
         private static string _CachePath = AppDomain.CurrentDomain.GetData("DataDirectory") + "\\umar";
@@ -55,8 +54,7 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
             var imageConfig = new ViewerConfig
             {
                 StoragePath = _storagePath, 
-                UseCache = true,
-                UsePdf = true
+                UseCache = true, 
             };
             _imageHandler = new ViewerImageHandler(imageConfig);
 
@@ -487,7 +485,7 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
             if (request.PreloadPagesCount.HasValue && request.PreloadPagesCount.Value > 0)
             {
                 htmlOptions.PageNumber = 1;
-                htmlOptions.CountPagesToConvert = request.PreloadPagesCount.Value;
+                htmlOptions.CountPagesToRender = request.PreloadPagesCount.Value;
             }
 
             List<string> cssList;
@@ -511,7 +509,14 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
                 htmlPages.AddRange(attachmentPages);
 
             }
-            result.documentDescription = new FileDataJsonSerializer(fileData, new FileDataOptions()).Serialize(false);
+            SerializationOptions serializationOptions = new SerializationOptions
+            {
+                UsePdf = request.UsePdf,
+                SupportListOfBookmarks = request.SupportListOfBookmarks,
+                SupportListOfContentControls = request.SupportListOfContentControls
+            };
+            var documentInfoJson = new DocumentInfoJsonSerializer(docInfo, serializationOptions).Serialize();
+            result.documentDescription = documentInfoJson;
             result.docType = docInfo.DocumentType;
             result.fileType = docInfo.FileType;
             result.pageHtml = htmlPages.Select(_ => _.HtmlContent).ToArray();
@@ -527,8 +532,8 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
             DocumentInfoContainer documentInfoContainer = _imageHandler.GetDocumentInfo(guid);
             int pageNumber = documentInfoContainer.Pages[pageIndex].Number;
 
-            RotatePageOptions rotatePageOptions = new RotatePageOptions(guid, pageNumber, parameters.RotationAmount);
-            _imageHandler.RotatePage(rotatePageOptions);
+            RotatePageOptions rotatePageOptions = new RotatePageOptions( pageNumber, parameters.RotationAmount);
+            _imageHandler.RotatePage(guid,rotatePageOptions);
             DocumentInfoContainer container = _imageHandler.GetDocumentInfo(guid);
 
             PageData pageData = container.Pages.Single(_ => _.Number == pageNumber);
@@ -556,7 +561,7 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
             var htmlOptions = new HtmlOptions
             {
                 PageNumber = parameters.PageIndex + 1,
-                CountPagesToConvert = 1,
+                CountPagesToRender = 1,
                 IsResourcesEmbedded = false,
                 HtmlResourcePrefix = string.Format(
                     "/GetResourceForHtml.aspx?documentPath={0}", parameters.Path) +
@@ -582,8 +587,8 @@ namespace GroupDocs.Viewer.WebForm.FrontEnd
             int pageNumber = documentInfoContainer.Pages[parameters.OldPosition].Number;
             int newPosition = parameters.NewPosition + 1;
 
-            ReorderPageOptions reorderPageOptions = new ReorderPageOptions(guid, pageNumber, newPosition);
-            _imageHandler.ReorderPage(reorderPageOptions);
+            ReorderPageOptions reorderPageOptions = new ReorderPageOptions( pageNumber, newPosition);
+            _imageHandler.ReorderPage(guid,reorderPageOptions);
 
             return (new ReorderPageResponse());
         }
