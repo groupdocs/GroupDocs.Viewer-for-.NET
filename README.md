@@ -1,6 +1,6 @@
 # GroupDocs.Viewer for .NET
 
-This package contains [Examples](https://github.com/groupdocsviewer/GroupDocs.Viewer-for-.NET/tree/master/Examples) and  [Showcases](https://github.com/groupdocsviewer/GroupDocs_Viewer_NET/tree/master/Showcases) for [GroupDocs.Viewer for .NET](https://www.groupdocs.com/products/viewer/net) that will help you in understanding the API's working and writing your own applications.
+This package contains [Examples](https://github.com/groupdocsviewer/GroupDocs.Viewer-for-.NET/tree/master/Examples) and  [Showcases](https://github.com/groupdocsviewer/GroupDocs_Viewer_NET/tree/master/Showcases) for [GroupDocs.Viewer for .NET](https://products.groupdocs.com/viewer/net) that will help you in understanding the API's working and writing your own applications.
 
 GroupDocs.Viewer for .NET is a .NET API which provides the technology to create powerful document viewer component that allows you to display over 50 document formats in your .NET applications. The viewer can both rasterize documents and convert them to SVG+HTML+CSS, delivering true-text high-fidelity rendering. Supported file formats include: Microsoft Office, Visio, Project, and Outlook documents, PDFs, AutoCAD, image files (TIFF, JPG, BMP, GIF, TIFF, etc.) and more.
 
@@ -14,12 +14,12 @@ GroupDocs.Viewer for .NET is a .NET API which provides the technology to create 
 Directory | Description
 --------- | -----------
 [Examples](https://github.com/groupdocsviewer/GroupDocs.Viewer-for-.NET/tree/master/Examples)  | Contains the package of all .NET C# examples and sample files that will help you learn how to use product features. 
-[Showcases](https://github.com/groupdocsviewer/GroupDocs.Viewer-for-.NET/tree/master/Showcases)  | The *Legacy Front End* and *New Front End* are the open source web based projects. These projects are based on Front Controller Design pattern and demonstrate the salient features of GroupDocs.Viewer. 
+[Showcases](https://github.com/groupdocsviewer/GroupDocs.Viewer-for-.NET/tree/master/Showcases)  | The open source UI examples have been developed to help the developers in order to give them an idea that how they will integrate the GroupDocs.Viewer for .NET API in the front end applications. 
 [Plugins](https://github.com/groupdocs-viewer/GroupDocs.Viewer-for-.NET/tree/master/Plugins/GroupDocs_Viewer_VSPlugin)  | Contains the plugins related to GroupDocs.Viewer for Visual Studio.
 ## Resources
 
 + **Website:** [www.groupdocs.com](http://www.groupdocs.com)
-+ **Product Home:** [GroupDocs.Viewer for .NET](https://www.groupdocs.com/products/viewer/net)
++ **Product Home:** [GroupDocs.Viewer for .NET](https://products.groupdocs.com/viewer/net)
 + **Product API References:** [API of GroupDocs.Viewer for .NET](https://apireference.groupdocs.com/net/viewer)
 + **Download:** [Download GroupDocs.Viewer for .NET](http://downloads.groupdocs.com/viewer/net)
 + **Documentation:** [GroupDocs.Viewer for .NET Documentation](https://docs.groupdocs.com/display/viewernet/Home)
