@@ -609,6 +609,65 @@ namespace GroupDocs.Viewer.Examples.CSharp
         }
 
         /// <summary>
+        /// Renders specific layer from CAD document  
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderSpecificLayerOfCadDocument(String DocumentName)
+        {
+            //ExStart:RenderSpecificLayerOfCadDocument_18.1
+            // Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config); 
+            string guid = DocumentName;
+
+            // Set CAD options to render two Layers
+            HtmlOptions options = new HtmlOptions(); 
+            options.CadOptions.Layers.Add("electrical");
+            options.CadOptions.Layers.Add("walls");
+
+            // Get pages 
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderSpecificLayerOfCadDocument_18.1
+        }
+
+        /// <summary>
+        /// Renders document with default font setting
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderDocumentAsHtmlWithDefaultFontSetting(String DocumentName)
+        {
+            //ExStart:RenderDocumentAsHtmlWithDefaultFontSetting_18.1
+            // Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+            string guid = DocumentName;
+
+            // Set default font
+            HtmlOptions options = new HtmlOptions();
+            options.DefaultFontName = "Calibri";
+
+            // Get pages 
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderDocumentAsHtmlWithDefaultFontSetting_18.1
+        }
+
+        /// <summary>
         /// Gets list of all Layouts from CAD document
         /// </summary>
         /// <param name="DocumentName">File name</param> 
@@ -1024,6 +1083,136 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //ExEnd:RotateDocumentPagesWithRenderOptionsAsHTML
         }
 
+        /// <summary>
+        /// Renders document into Html with Enable Minification setting
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderDocumentAsHtmlWithEnableMinification(string DocumentName)
+        {
+            //ExStart:RenderDocumentAsHtmlWithEnableMinification_17.12
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            //Instantiate the HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            options.EnableMinification = true;
+
+            //Get document pages in html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderDocumentAsHtmlWithEnableMinification_17.12
+        }
+
+        /// <summary>
+        /// Renders MS Project document into Html with ProjectOptions setting
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderProjectDocumentAsHtmlWithProjectOptions(string DocumentName)
+        {
+            //ExStart:RenderProjectDocumentAsHtmlWithProjectOptions_17.12
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            //Instantiate the HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            options.ProjectOptions.PageSize = PageSize.A2;
+            options.ProjectOptions.TimeUnit = TimeUnit.Days;
+
+            //Get document pages in html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderProjectDocumentAsHtmlWithProjectOptions_17.12
+        }
+
+        /// <summary>
+        /// Renders Presentation document into Html along with the slide notes
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderPresentationDocumentWithNotes(string DocumentName)
+        {
+            //ExStart:RenderPresentationDocumentWithNotes_18.11
+            // Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // Set guid
+            string guid = DocumentName;
+
+            // Instantiate HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            options.SlidesOptions.RenderNotes = true; // Default value is false
+
+            // Get document pages in Html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderPresentationDocumentWithNotes_18.11
+        }
+
+        /// <summary>
+        /// Renders PDF document into Html with image quality settings
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderPDFDocumentAsHtmlWithImageQuality(string DocumentName)
+        {
+            //ExStart:RenderPDFDocumentAsHtmlWithImageQuality_18.3
+            // Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // Set guid
+            string guid = DocumentName;
+
+            // Instantiate HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            //Set desired image quality in the output HTML document
+            HtmlOptions htmlOptions = new HtmlOptions();
+            htmlOptions.PdfOptions.ImageQuality = ImageQuality.High;
+
+            // Get document pages in Html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderPDFDocumentAsHtmlWithImageQuality_18.3
+        }
         #endregion
 
         #region ImageRepresentation
@@ -1476,6 +1665,38 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:RotateDocumentPagesWithRenderOptionsAsImage
         }
+
+        /// <summary>
+        /// Renders MS Project document into image with ProjectOptions setting
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderProjectDocumentAsImageWithProjectOptions(string DocumentName)
+        {
+            //ExStart:RenderProjectDocumentAsImageWithProjectOptions_17.12
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            // Set Project options to render content with a specified size and time unit.
+            ImageOptions options = new ImageOptions();
+            options.ProjectOptions.PageSize = PageSize.A2;
+            options.ProjectOptions.TimeUnit = TimeUnit.Days;
+
+            // Get pages 
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:RenderProjectDocumentAsImageWithProjectOptions_17.12
+        }
         #endregion
 
         #region GeneralRepresentation
@@ -1495,8 +1716,8 @@ namespace GroupDocs.Viewer.Examples.CSharp
             // Get original file
             FileContainer container = imageHandler.GetFile(guid);
 
-            //Save each image at disk
-            Utilities.SaveAsImage(DocumentName, container.Stream);
+            //Save file at disk
+            Utilities.SaveFile(DocumentName, container.Stream);
             //ExEnd:RenderOriginal
 
         }
@@ -1520,7 +1741,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderAsPdf
 
@@ -1547,7 +1768,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderDocumentAsPDFWithoutAnnotations
 
@@ -1573,7 +1794,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderWordDocumentAsPDFWithTrackedChanges
 
@@ -1608,7 +1829,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderAsPdf
 
@@ -1647,7 +1868,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderAsPdf
 
@@ -1673,7 +1894,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderDocumentAsPDFWithJpegQualitySettings
 
@@ -1698,10 +1919,43 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Change the extension of the file and assign to a string type variable filename
             String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
 
-            //Save each image at disk
+            //Save file at disk
             Utilities.SaveFile(filename, container.Stream);
             //ExEnd:RenderDocumentWithCommentsAsPDF
         }
+
+        /// <summary>
+        /// Renders MS Project document as PDF with ProjectOptions setting
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderProjectDocumentAsPDFWithProjectOptions(string DocumentName)
+        {
+            //ExStart:RenderProjectDocumentAsPDFWithProjectOptions_17.12
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            // Set Project options to render content with a specified size and time unit.
+            PdfFileOptions options = new PdfFileOptions();
+            options.ProjectOptions.PageSize = PageSize.A2;
+            options.ProjectOptions.TimeUnit = TimeUnit.Days;
+
+            // Get PDF file 
+            FileContainer fileContainer = imageHandler.GetPdfFile(guid, options);
+
+            // Set file name
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save file at disk
+            Utilities.SaveFile(filename, fileContainer.Stream);
+            //ExEnd:RenderProjectDocumentAsPDFWithProjectOptions_17.12
+        }
+
 
         /// <summary>
         /// Loads directory structure as file tree
@@ -1747,6 +2001,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //ExEnd:LoadFileTree
 
         }
+
         #endregion
 
         #region InputDataHandlers
@@ -2091,7 +2346,34 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
         }
 
+        /// <summary>
+        /// Gets layers' information of CAD documents
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void GetLayersInfoForCadDcouments(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetLayersInfoForCadDcouments_18.1
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
 
+                // Create image handler
+                ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+                string guid = "withLayers.dwg";
+
+                CadDocumentInfoContainer documentInfo = (CadDocumentInfoContainer)imageHandler.GetDocumentInfo(guid);
+
+                // Loop through all layers contained in the drawing 
+                foreach (string layer in documentInfo.Layers)
+                    Console.WriteLine("Layer name: {0}", layer);
+                //ExEnd:GetLayersInfoForCadDcouments_18.1
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
         #endregion
 
         #region DocumentCache
@@ -2143,6 +2425,29 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
         }
 
+        /// <summary>
+        /// Removes cache files for specific document
+        /// </summary>
+        public static void RemoveCacheFiles(string guid)
+        {
+            try
+            {
+                //ExStart:RemoveCacheFilesForSpecificDocument_17.12
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Init viewer image or html handler
+                ViewerHtmlHandler viewerImageHandler = new ViewerHtmlHandler(config);
+
+                //Clear cache files 
+                viewerImageHandler.ClearCache(guid);
+                //ExEnd:RemoveCacheFilesForSpecificDocument_17.12
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
         #endregion
 
         #region Others
