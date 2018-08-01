@@ -14,6 +14,9 @@ using GroupDocs.Viewer.Domain.Containers;
 using System.IO;
 using GroupDocs.Viewer.Handler.Input;
 using System.Globalization;
+using Amazon.S3.Model;
+using Amazon.S3;
+using GroupDocs.Viewer.Examples.CSharp.SimpleFileStorageInterfaces;
 
 namespace GroupDocs.Viewer.Examples.CSharp
 {
@@ -41,7 +44,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions();
 
             //to get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = true;
+            options.EmbedResources = true;
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
@@ -83,7 +86,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Instantiate the HtmlOptions object 
             HtmlOptions options = new HtmlOptions();
 
-            options.IsResourcesEmbedded = false;
+            options.EmbedResources = false;
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
                 options.Password = DocumentPassword;
@@ -125,7 +128,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions { Transformations = Transformation.Reorder };
 
             //to get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = true;
+            options.EmbedResources = true;
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
@@ -200,7 +203,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions();
 
             //to get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = true;
+            options.EmbedResources = true;
             options.EnableResponsiveRendering = true;
 
             //Get document pages in html form
@@ -356,7 +359,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions();
 
             //To get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = false;
+            options.EmbedResources = false;
 
             //Set resource prefix
             options.HtmlResourcePrefix = "http://example.com/api/pages/{page-number}/resources/{resource-name}";
@@ -526,7 +529,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions();
 
             //to get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = true;
+            options.EmbedResources = true;
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
@@ -619,11 +622,11 @@ namespace GroupDocs.Viewer.Examples.CSharp
             ViewerConfig config = Utilities.GetConfigurations();
 
             // Create html handler
-            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config); 
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
             string guid = DocumentName;
 
             // Set CAD options to render two Layers
-            HtmlOptions options = new HtmlOptions(); 
+            HtmlOptions options = new HtmlOptions();
             options.CadOptions.Layers.Add("electrical");
             options.CadOptions.Layers.Add("walls");
 
@@ -748,7 +751,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions options = new HtmlOptions();
 
             //to get html representations of pages with embedded resources
-            options.IsResourcesEmbedded = true;
+            options.EmbedResources = true;
 
             // Set password if document is password protected. 
             if (!String.IsNullOrEmpty(DocumentPassword))
@@ -1026,13 +1029,13 @@ namespace GroupDocs.Viewer.Examples.CSharp
             HtmlOptions.Transformations = Transformation.Reorder;
 
             // To get html representations of pages with embedded resources
-            HtmlOptions.IsResourcesEmbedded = true;
+            HtmlOptions.EmbedResources = true;
 
             // Set reorder options
             ReorderPageOptions ReorderOptions = new ReorderPageOptions(CurrentPageNumber, NewPageNumber);
 
             // Call ViewerHandler's Reorder page function by passing initialized ReorderPageOptions and HtmlOptions.
-            handler.ReorderPage(guid, ReorderOptions, HtmlOptions); 
+            handler.ReorderPage(guid, ReorderOptions, HtmlOptions);
 
             // Get document pages in html form
             List<PageHtml> pages = handler.GetPages(guid, HtmlOptions);
@@ -1213,6 +1216,140 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:RenderPDFDocumentAsHtmlWithImageQuality_18.3
         }
+
+        /// <summary>
+        /// Renders print area only in Excel document
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderPrintAreaOnlyInExcel(String DocumentName)
+        {
+            //ExStart:RenderPrintAreaOnlyInExcel_18.4
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Enable redering of print area
+            HtmlOptions options = new HtmlOptions();
+            options.CellsOptions.RenderPrintAreaOnly = true;
+
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderPrintAreaOnlyInExcel_18.4
+        }
+
+        /// <summary>
+        /// Renders hidden columsn and rows in Excel document
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderHiddenContentInExcel(String DocumentName)
+        {
+            //ExStart:RenderHiddenContentInExcel_18.4
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Enable redering of hidden rows and columns
+            HtmlOptions options = new HtmlOptions();
+            options.CellsOptions.ShowHiddenRows = true;
+            options.CellsOptions.ShowHiddenColumns = true;
+
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderHiddenContentInExcel_18.4
+        }
+
+        /// <summary>
+        /// Set field labels when rendering email documents
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void SetFieldLabelsWhenRenderingEmailMessage(String DocumentName)
+        {
+            //ExStart:ChangeFieldLabelsWhenRenderingEmailMessage_18.5
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Set field labels 
+            HtmlOptions htmlOptions = new HtmlOptions();
+            htmlOptions.EmailOptions.FieldLabels[EmailField.From] = "Sender";
+            htmlOptions.EmailOptions.FieldLabels[EmailField.To] = "Receiver";
+            htmlOptions.EmailOptions.FieldLabels[EmailField.Sent] = "Date";
+            htmlOptions.EmailOptions.FieldLabels[EmailField.Subject] = "Topic";
+
+            // Render document with custom field labels
+            List<PageHtml> pages = htmlHandler.GetPages(guid, htmlOptions);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:ChangeFieldLabelsWhenRenderingEmailMessage_18.5
+        }
+
+        /// <summary>
+        /// Render document as HTML with force password validation settings
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderDocumentAsHtmlWithForcePasswordValidation(String DocumentName)
+        {
+            //ExStart:RenderDocumentAsHtmlWithForcePasswordValidation_18.6
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            //Set the password to be validated on every call
+            config.ForcePasswordValidation = true;
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            //Instantiate the HtmlOptions object
+            HtmlOptions options = new HtmlOptions();
+
+            //to get html representations of pages with embedded resources
+            options.EmbedResources = true;
+
+            // Set document password
+            options.Password = "password";
+            //options.PageNumbersToConvert = Enumerable.Range(1, 3).ToList();
+
+            //Get document pages in html form
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderDocumentAsHtmlWithForcePasswordValidation_18.6
+        }
+
+
         #endregion
 
         #region ImageRepresentation
@@ -1697,6 +1834,200 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:RenderProjectDocumentAsImageWithProjectOptions_17.12
         }
+
+        /// <summary>
+        /// Renders print area only in Excel document
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderPrintAreaOnlyAsImageInExcel(String DocumentName)
+        {
+            //ExStart:RenderPrintAreaOnlyAsImageInExcel_18.4
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            // Enable redering of print area
+            ImageOptions options = new ImageOptions();
+            options.CellsOptions.RenderPrintAreaOnly = true;
+
+            // Get pages 
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:RenderPrintAreaOnlyAsImageInExcel_18.4
+        }
+
+        /// <summary>
+        /// Renders hidden columsn and rows in Excel document
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderHiddenContentInExcelAsImage(String DocumentName)
+        {
+            //ExStart:RenderHiddenContentAsImageInExcel_18.4
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Enable redering of hidden rows and columns
+            ImageOptions options = new ImageOptions();
+            options.CellsOptions.ShowHiddenRows = true;
+            options.CellsOptions.ShowHiddenColumns = true;
+
+            // Get pages 
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:RenderHiddenContentAsImageInExcel_18.4
+        }
+
+        /// <summary>
+        /// Renders .msg file as image with page size settings
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderEmailDocumentAsImageWithPageSizeSettings(String DocumentName)
+        {
+            //ExStart:RenderEmailDocumentAsImageWithPageSizeSettings_18.5
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Set page size
+            ImageOptions options = new ImageOptions();
+            options.EmailOptions.PageSize = PageSize.A4;
+
+            // Get pages 
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:RenderEmailDocumentAsImageWithPageSizeSettings_18.5
+        }
+
+        /// <summary>
+        /// Renders CAD document with tiled rendering
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void TiledRenderingOfCADDocuments(String DocumentName)
+        {
+            //ExStart:TiledRenderingOfCADDocuments_18.6
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            // Get document width and height
+            DocumentInfoContainer docInfo = imageHandler.GetDocumentInfo(guid);
+            int width = docInfo.Pages[0].Width;
+            int height = docInfo.Pages[0].Height;
+
+            // Set tile width and height as a half of image total width
+            int tileWidth = width / 2;
+            int tileHeight = height / 2;
+
+            int pointX = 0;
+            int pointY = 0;
+            //Create image options and add four tiles, one for each quarter
+            ImageOptions options = new ImageOptions();
+            Tile tile = new Tile(pointX, pointY, tileWidth, tileHeight);
+            options.CadOptions.Tiles.Add(tile);
+            pointX += tileWidth;
+            tile = new Tile(pointX, pointY, tileWidth, tileHeight);
+            options.CadOptions.Tiles.Add(tile);
+
+            pointX = 0;
+            pointY += tileHeight;
+            tile = new Tile(pointX, pointY, tileWidth, tileHeight);
+            options.CadOptions.Tiles.Add(tile);
+
+            pointX += tileWidth;
+            tile = new Tile(pointX, pointY, tileWidth, tileHeight);
+            options.CadOptions.Tiles.Add(tile);
+            // The pages list will contain four images, one for each quarter
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:TiledRenderingOfCADDocuments_18.6
+        }
+        /// <summary>
+        /// Renders CAD document with tiled rendering
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void TiledRenderingOfCADDocumentsWithManualSizeSettings(String DocumentName)
+        {
+            //ExStart:TiledRenderingOfCADDocumentsWithManualSizeSettings_18.6
+            // Setup GroupDocs.Viewer config
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // File guid
+            string guid = DocumentName;
+
+            //Set same ScaleFactor or Width and Height properties as used for GetPages method
+            DocumentInfoOptions docInfoOptions = new DocumentInfoOptions();
+            docInfoOptions.CadOptions.ScaleFactor = 100;
+            // Get width and height
+            DocumentInfoContainer docInfo = imageHandler.GetDocumentInfo(guid, docInfoOptions);
+            int width = docInfo.Pages[0].Width;
+            int height = docInfo.Pages[0].Height;
+
+            // Set tile width and height as a half of image total width
+            int tileWidth = width / 2;
+            int tileHeight = height / 2;
+
+            int pointX = 0;
+            int pointY = 0;
+            //Create image options and add tile
+            ImageOptions options = new ImageOptions();
+            options.CadOptions.ScaleFactor = 100;
+            Tile tile = new Tile(pointX, pointY, tileWidth, tileHeight);
+            options.CadOptions.Tiles.Add(tile);
+
+            // The pages list will contain four images, one for each quarter
+            List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+            foreach (PageImage page in pages)
+            {
+                // Save each image at disk
+                Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+            }
+            //ExEnd:TiledRenderingOfCADDocumentsWithManualSizeSettings_18.6
+        }
+
         #endregion
 
         #region GeneralRepresentation
@@ -1956,6 +2287,68 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //ExEnd:RenderProjectDocumentAsPDFWithProjectOptions_17.12
         }
 
+        /// <summary>
+        /// Renders print area only in Excel documents as PDF
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderPrintAreasInExcelAsPDF(string DocumentName)
+        {
+            //ExStart:RenderPrintAreasInExcelAsPDF_18.4
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            // Enable redering of print area
+            PdfFileOptions options = new PdfFileOptions();
+            options.CellsOptions.RenderPrintAreaOnly = true;
+
+            // Get PDF file 
+            FileContainer fileContainer = imageHandler.GetPdfFile(guid, options);
+
+            // Set file name
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save file at disk
+            Utilities.SaveFile(filename, fileContainer.Stream);
+            //ExEnd:RenderPrintAreasInExcelAsPDF_18.4
+        }
+
+        /// <summary>
+        /// Renders hidden columns and rows in Excel documents as PDF
+        /// </summary>
+        /// <param name="DocumentName">File name</param> 
+        public static void RenderHiddenContentInExcelAsPDF(string DocumentName)
+        {
+            //ExStart:RenderHiddenContentInExcelAsPDF_18.4
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            // Guid implies that unique document name 
+            string guid = DocumentName;
+
+            // Enable redering of hidden rows and columns
+            PdfFileOptions options = new PdfFileOptions();
+            options.CellsOptions.ShowHiddenRows = true;
+            options.CellsOptions.ShowHiddenColumns = true;
+
+            // Get PDF file 
+            FileContainer fileContainer = imageHandler.GetPdfFile(guid, options);
+
+            // Set file name
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save file at disk
+            Utilities.SaveFile(filename, fileContainer.Stream);
+            //ExEnd:RenderHiddenContentInExcelAsPDF_18.4
+        }
 
         /// <summary>
         /// Loads directory structure as file tree
@@ -2000,6 +2393,36 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:LoadFileTree
 
+        }
+
+        /// <summary>
+        /// Renders .msg file as PDF with page size settings
+        /// </summary>
+        /// <param name="DocumentName"></param>
+        public static void RenderEmailDocumentAsPDFWithPageSizeSettings(String DocumentName)
+        {
+            //ExStart:RenderEmailDocumentAsPDFWithPageSizeSettings_18.5
+            //Get Configurations
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+
+            string guid = DocumentName;
+
+            // Set page size
+            PdfFileOptions options = new PdfFileOptions();
+            options.EmailOptions.PageSize = PageSize.A4;
+
+            // Get PDF file 
+            FileContainer fileContainer = imageHandler.GetPdfFile(guid, options);
+
+            // Set file name
+            String filename = Path.GetFileNameWithoutExtension(DocumentName) + ".pdf";
+
+            //Save file at disk
+            Utilities.SaveFile(filename, fileContainer.Stream);
+            //ExEnd:RenderEmailDocumentAsPDFWithPageSizeSettings_18.5
         }
 
         #endregion
@@ -2142,7 +2565,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
                 // Setup html conversion options
                 HtmlOptions htmlOptions = new HtmlOptions();
-                htmlOptions.IsResourcesEmbedded = false;
+                htmlOptions.EmbedResources = false;
 
                 // Init viewer html handler
                 ViewerHtmlHandler handler = new ViewerHtmlHandler(config);
@@ -2401,29 +2824,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
         }
 
-        /// <summary>
-        /// Removes cache file older than specified date 
-        /// </summary>
-        public static void RemoveCacheFiles(TimeSpan OlderThanDays)
-        {
-            try
-            {
-                //ExStart:RemoveCacheFilesTimeSpan
-                // Setup GroupDocs.Viewer config
-                ViewerConfig config = Utilities.GetConfigurations();
-
-                // Init viewer image or html handler
-                ViewerImageHandler viewerImageHandler = new ViewerImageHandler(config);
-
-                //Clear files from cache older than specified time interval 
-                viewerImageHandler.ClearCache(OlderThanDays);
-                //ExEnd:RemoveCacheFilesTimeSpan
-            }
-            catch (System.Exception exp)
-            {
-                Console.WriteLine(exp.Message);
-            }
-        }
+        
 
         /// <summary>
         /// Removes cache files for specific document
@@ -2474,6 +2875,46 @@ namespace GroupDocs.Viewer.Examples.CSharp
             Console.ReadKey();
         }
 
+        #endregion
+        #region AmazonS3FileStorageOperations
+        //ExStart:AmazonS3FileStorage-Usage_18.4
+        public static void GetHtmlPagesFromAmazonS3FileStorage(string filePath, string bucketName)
+        {
+            //TODO: set your Amazon S3 credentials in app.config file
+            string FileName = "sample.doc";
+            string BucketName = "your-bucket-name";
+            UploadFile(FileName, BucketName);
+
+            AmazonS3Client amazonS3Client = new AmazonS3Client();
+            AmazonS3FileStorage fileManager = new AmazonS3FileStorage(amazonS3Client, bucketName);
+
+            ViewerHtmlHandler handler = new ViewerHtmlHandler(fileManager);
+
+            List<PageHtml> pages = handler.GetPages(filePath);
+
+            foreach (PageHtml page in pages)
+            {
+                //TODO: save pages
+            }
+
+            fileManager.Dispose();
+        }
+
+        private static void UploadFile(string fileName, string bucketName)
+        {
+            using (var amazonS3Client = new AmazonS3Client())
+            {
+                PutObjectRequest request = new PutObjectRequest
+                {
+                    Key = "files/" + fileName,
+                    BucketName = bucketName,
+                    InputStream = File.OpenRead(fileName)
+                };
+
+                amazonS3Client.PutObject(request);
+            }
+        }
+        //ExEnd:AmazonS3FileStorage-Usage_18.4
         #endregion
     }
 
