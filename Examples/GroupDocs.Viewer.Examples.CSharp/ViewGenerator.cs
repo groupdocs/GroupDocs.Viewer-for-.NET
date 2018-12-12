@@ -492,7 +492,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
             string guid = DocumentName;
 
-            // Set Cells options to hide overflowing text
+            // Set Cells options to ignore empty rows
             HtmlOptions options = new HtmlOptions();
             options.CellsOptions.IgnoreEmptyRows = true; // default value is false
 
@@ -505,6 +505,36 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
             }
             //ExEnd:RenderExcelAsHtmlIgnoringEmptyRows
+
+        }
+
+        /// <summary>
+        /// Renders Excel file as Html ignoring the empty columns
+        /// </summary>
+        /// <param name="DocumentName">file/document name</param>
+        public static void RenderExcelAsHtmlIgnoringEmptyColumns(string DocumentName)
+        {
+
+            //ExStart:RenderExcelAsHtmlIgnoringEmptyColumns_18.12
+            ViewerConfig config = Utilities.GetConfigurations();
+
+            // Create html handler
+            ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
+            string guid = DocumentName;
+
+            // Set Cells options to ignore empty columns
+            HtmlOptions options = new HtmlOptions();
+            options.CellsOptions.IgnoreEmptyColumns = true; // default value is false
+
+            // Get pages
+            List<PageHtml> pages = htmlHandler.GetPages(guid, options);
+
+            foreach (PageHtml page in pages)
+            {
+                //Save each page at disk
+                Utilities.SaveAsHtml(page.PageNumber + "_" + DocumentName, page.HtmlContent);
+            }
+            //ExEnd:RenderExcelAsHtmlIgnoringEmptyColumns_18.12
 
         }
 
@@ -1016,7 +1046,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
         {
             // Setup GroupDocs.Viewer config
             ViewerConfig config = Utilities.GetConfigurations();
-            config.LocalesPath = @"D:\from office working\for aspose\GroupDocsViewer\GroupDocs.Viewer.Examples\Data\Locale";
+            config.LocalesPath = @"\Data\Locale";
 
             CultureInfo cultureInfo = new CultureInfo("fr-FR");
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config, cultureInfo);
@@ -1391,7 +1421,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //ExStart:RenderOutlookDataFileWithLimitOfItems_18.9
             //Get Configurations
             ViewerConfig config = Utilities.GetConfigurations();
-           
+
             ViewerHtmlHandler htmlHandler = new ViewerHtmlHandler(config);
 
             // Guid implies that unique document name 
@@ -1411,6 +1441,8 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:RenderOutlookDataFileWithLimitOfItems_18.9
         }
+
+        
         #endregion
 
         #region ImageRepresentation
@@ -2042,7 +2074,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
             //ExEnd:TiledRenderingOfCADDocuments_18.6
         }
-       
+
         /// <summary>
         /// Renders CAD document with tiled rendering
         /// </summary>
@@ -2109,7 +2141,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             ImageOptions options = new ImageOptions();
             options.ProjectOptions.StartDate = new DateTime(2018, 01, 01);
             options.ProjectOptions.EndDate = new DateTime(2018, 12, 31);
-            
+
             List<PageImage> pages = imageHandler.GetPages(guid, options);
 
             foreach (PageImage page in pages)
@@ -2134,7 +2166,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             string guid = DocumentName;
 
             // Create html handler
-            ViewerImageHandler imageHandler = new ViewerImageHandler(config); 
+            ViewerImageHandler imageHandler = new ViewerImageHandler(config);
 
             ProjectDocumentInfoContainer documentInfo = (ProjectDocumentInfoContainer)imageHandler.GetDocumentInfo(guid);
 
@@ -2142,6 +2174,42 @@ namespace GroupDocs.Viewer.Examples.CSharp
             Console.WriteLine("Project start date: {0}", documentInfo.StartDate);
             Console.WriteLine("Project end date: {0}", documentInfo.EndDate);
             //ExEnd:ObtainStartAndEndDateFromMSProjectDocument_18.9
+        }
+
+        /// <summary>
+        /// Renders messages from specified Outlook folder
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void RenderMessagesFromSpecifiedOutlookFolder(String DocumentName)
+        {
+            try
+            {
+                //ExStart:RenderMessagesFromSpecifiedOutlookFolder_18.12
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+                string guid = DocumentName;
+
+                // Create image options with specified folder name (use HtmlOptions to render into HTML)
+                ImageOptions options = new ImageOptions();
+                options.OutlookOptions.FolderName = "Inbox\\Sub Folder 1";
+
+                // Render document into image (List<PageHtml> is returned when rendering into HTML)
+                List<PageImage> pages = imageHandler.GetPages(guid, options);
+
+                foreach (PageImage page in pages)
+                {
+                    // Save each image at disk
+                    Utilities.SaveAsImage(page.PageNumber + "_" + DocumentName, page.Stream);
+                }
+                //ExEnd:RenderMessagesFromSpecifiedOutlookFolder_18.12
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
         }
         #endregion
 
@@ -2500,7 +2568,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
                     Console.WriteLine("Guid: {0} | Name: {1} | Document type: {2} | File type: {3} | Extension: {4} | Size: {5} | LastModificationDate: {6}",
                         node.Guid,
                         node.Name,
-                        node.FileFormat, 
+                        node.FileFormat,
                         node.Extension,
                         node.Size,
                         node.LastModificationDate);
@@ -2594,10 +2662,43 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Access PDF file stream.
             Stream pdfFileStream = fileContainer.Stream;
+            
             //Save file
-
             Utilities.SaveFile(guid, fileContainer.Stream);
             //ExEnd:RenderOutlookDataFileWithLimitOfItemsAsPDF_18.9
+        }
+
+        /// <summary>
+        /// Renders messages as PDF from specified Outlook folder
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void RenderMessagesFromSpecifiedOutlookFolderAsPDF(String DocumentName)
+        {
+            try
+            {
+                //ExStart:RenderMessagesFromSpecifiedOutlookFolderAsPDF_18.12
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+                string guid = DocumentName;
+
+                // Create pdf options with specified folder name
+                PdfFileOptions options = new PdfFileOptions();
+                options.OutlookOptions.FolderName = "Inbox";
+
+                // Get pdf document
+                FileContainer fileContainer = imageHandler.GetPdfFile(guid, options);
+
+                //Save file
+                Utilities.SaveFile(guid, fileContainer.Stream);
+                //ExEnd:RenderMessagesFromSpecifiedOutlookFolderAsPDF_18.12
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
         }
         #endregion
 
@@ -2726,6 +2827,36 @@ namespace GroupDocs.Viewer.Examples.CSharp
         }
 
         /// <summary>
+        /// Gets image attachment of email message
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetEmailAttachmentsFromStream(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetEmailAttachmentsFromStream_18.11
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler handler = new ViewerImageHandler(config);
+                Attachment attachment = new Attachment(DocumentName, "attachment-image.png");
+
+                /// Get attachment original file using document stream
+                using (FileStream fileStream = (FileStream)Utilities.GetDocumentStream(DocumentName))
+                using (FileContainer fileContainer = handler.GetFile(fileStream, attachment))
+                {
+                    Console.WriteLine("Attach stream lenght: {0}", fileContainer.Stream.Length);
+                }
+                //ExEnd:GetEmailAttachmentsFromStream_18.11
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
         /// Gets html representation of attachment files
         /// </summary>
         /// <param name="DocumentName">Input document name</param>
@@ -2770,7 +2901,52 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 Console.WriteLine(exp.Message);
             }
         }
+        /// <summary>
+        /// Gets html representation of attachment files
+        /// </summary>
+        /// <param name="DocumentName">Input document name</param>
+        public static void GetEmailAttachmentHTMLRepresentationFromStream(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetEmailAttachmentHTMLRepresentationFromStream_18.11
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
 
+                // Setup html conversion options
+                HtmlOptions htmlOptions = new HtmlOptions();
+                htmlOptions.EmbedResources = false;
+
+                Stream fileStream = Utilities.GetDocumentStream(DocumentName);
+                // Init viewer html handler
+                ViewerHtmlHandler handler = new ViewerHtmlHandler(config);
+
+                DocumentInfoContainer info = handler.GetDocumentInfo(fileStream);
+
+                // Iterate over the attachments collection
+                foreach (AttachmentBase attachment in info.Attachments)
+                {
+                    Console.WriteLine("Attach name: {0}, size: {1}", attachment.Name, attachment.FileType);
+
+                    // Get HTML representation of the attachment
+                    List<PageHtml> pages = handler.GetPages(fileStream, attachment, htmlOptions);
+                    foreach (PageHtml page in pages)
+                    {
+                        Console.WriteLine("  Page: {0}, size: {1}", page.PageNumber, page.HtmlContent.Length);
+                        foreach (HtmlResource htmlResource in page.HtmlResources)
+                        {
+                            Stream resourceStream = handler.GetResource(attachment, htmlResource);
+                            Console.WriteLine("     Resource: {0}, size: {1}", htmlResource.ResourceName, resourceStream.Length);
+                        }
+                    }
+                }
+                //ExEnd:GetEmailAttachmentHTMLRepresentationFromStream_18.11
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
         /// <summary>
         /// Gets image representation of attachment files
         /// </summary>
@@ -2829,8 +3005,8 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(guid, options);
 
                 Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
-                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat); 
-                Console.WriteLine("Extension: {0}", documentInfo.Extension); 
+                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
                 Console.WriteLine("Guid: {0}", documentInfo.Guid);
                 Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
                 Console.WriteLine("Name: {0}", documentInfo.Name);
@@ -2872,8 +3048,8 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(uri, options);
 
                 Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
-                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat); 
-                Console.WriteLine("Extension: {0}", documentInfo.Extension); 
+                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
                 Console.WriteLine("Guid: {0}", documentInfo.Guid);
                 Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
                 Console.WriteLine("Name: {0}", documentInfo.Name);
@@ -2915,8 +3091,8 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 DocumentInfoContainer documentInfo = htmlHandler.GetDocumentInfo(stream, options);
 
                 Console.WriteLine("DateCreated: {0}", documentInfo.DateCreated);
-                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat); 
-                Console.WriteLine("Extension: {0}", documentInfo.Extension); 
+                Console.WriteLine("FileFormat: {0}", documentInfo.FileFormat);
+                Console.WriteLine("Extension: {0}", documentInfo.Extension);
                 Console.WriteLine("Guid: {0}", documentInfo.Guid);
                 Console.WriteLine("LastModificationDate: {0}", documentInfo.LastModificationDate);
                 Console.WriteLine("Name: {0}", documentInfo.Name);
@@ -2951,7 +3127,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
                 // Create image handler
                 ViewerImageHandler imageHandler = new ViewerImageHandler(config);
-                string guid = "withLayers.dwg";
+                string guid = DocumentName;
 
                 CadDocumentInfoContainer documentInfo = (CadDocumentInfoContainer)imageHandler.GetDocumentInfo(guid);
 
@@ -2959,6 +3135,67 @@ namespace GroupDocs.Viewer.Examples.CSharp
                 foreach (string layer in documentInfo.Layers)
                     Console.WriteLine("Layer name: {0}", layer);
                 //ExEnd:GetLayersInfoForCadDcouments_18.1
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets list of Outlook folders
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void GetListOfOutlookFolders(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetListOfOutlookFolders_18.12
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+                string guid = DocumentName;
+
+                // Get Outlook document info
+                OutlookDocumentInfoContainer documentInfoContainer = imageHandler.GetDocumentInfo(guid) as OutlookDocumentInfoContainer;
+
+                foreach (string folderName in documentInfoContainer.Folders)
+                    Console.WriteLine("Folder name: {0}", folderName);
+                //ExEnd:GetListOfOutlookFolders_18.12
+            }
+            catch (System.Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets list of sub-folders from specified Outlook folder
+        /// </summary>
+        /// <param name="DocumentName">Name of input document</param>
+        public static void GetListOfSubFoldersFromSpecifiedFolder(String DocumentName)
+        {
+            try
+            {
+                //ExStart:GetListOfSubFoldersFromSpecifiedFolder_18.12
+                // Setup GroupDocs.Viewer config
+                ViewerConfig config = Utilities.GetConfigurations();
+
+                // Create image handler
+                ViewerImageHandler imageHandler = new ViewerImageHandler(config);
+                string guid = DocumentName;
+
+                // Create option object with specified folder name
+                DocumentInfoOptions options = new DocumentInfoOptions();
+                options.OutlookOptions.FolderName = "Inbox";
+                // Get outlook document info
+                OutlookDocumentInfoContainer documentInfoContainer = imageHandler.GetDocumentInfo(guid, options) as OutlookDocumentInfoContainer;
+
+                foreach (string folderName in documentInfoContainer.Folders)
+                    Console.WriteLine("Folder name: {0}", folderName);
+                //ExEnd:GetListOfSubFoldersFromSpecifiedFolder_18.12
             }
             catch (System.Exception exp)
             {
@@ -2992,7 +3229,7 @@ namespace GroupDocs.Viewer.Examples.CSharp
             }
         }
 
-        
+
 
         /// <summary>
         /// Removes cache files for specific document

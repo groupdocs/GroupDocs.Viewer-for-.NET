@@ -76,6 +76,9 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Render Excel document ignoring empty rows
             //ViewGenerator.RenderExcelAsHtmlIgnoringEmptyRows("sample.xlsx");
 
+            //Render Excel document ignoring empty columns
+            //ViewGenerator.RenderExcelAsHtmlIgnoringEmptyColumns("sample.xlsx");
+
             //Render CAD document as responsive HTML
             //ViewGenerator.RenderDocumentAsResponsiveHtml("sample.dwg");
 
@@ -160,6 +163,9 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Obtain start and end date from MS Project document
             //ViewGenerator.ObtainStartAndEndDateFromMSProjectDocument("sample.mpp");
+
+            // Render messages from specified folder in Outlook document
+            //ViewGenerator.RenderMessagesFromSpecifiedOutlookFolder("sample.ost");
             #endregion
 
             #region GeneralRepresentation
@@ -189,6 +195,9 @@ namespace GroupDocs.Viewer.Examples.CSharp
 
             // Render Outlook Data Files with limit of items
             //ViewGenerator.RenderOutlookDataFileWithLimitOfItemsAsPDF("sample.ost");
+
+            // Render messages as PDF from specified folder in Outlook document
+            //ViewGenerator.RenderMessagesFromSpecifiedOutlookFolderAsPDF("sample.ost");
             #endregion
 
             #region InputDataHandlers
@@ -237,14 +246,26 @@ namespace GroupDocs.Viewer.Examples.CSharp
             //Get layers' info in Cad document
             //ViewGenerator.GetLayersInfoForCadDcouments("sample.dwg");
 
+            //Get list of folders from Outlook message
+            //ViewGenerator.GetListOfOutlookFolders("sample.ost");
+
+            //Get list of sub-folders from a folder
+            //ViewGenerator.GetListOfSubFoldersFromSpecifiedFolder("sample.ost");
+
             #endregion
 
             #region EmailAttachments
             //Get email attachment files
             //ViewGenerator.GetEmailAttachments("sample.msg");
 
-            //Get email attachment html representation
+            //Get email attachments from document stream
+            //ViewGenerator.GetEmailAttachmentsFromStream("sample.msg");
+
+            //Get email attachment's HTML representation
             //ViewGenerator.GetEmailAttachmentHTMLRepresentation("sample.msg");
+
+            //Get email attachment's HTML representation from document stream
+            //ViewGenerator.GetEmailAttachmentHTMLRepresentationFromStream("sample.msg");
 
             //Get email attachment image representation
             //ViewGenerator.GetEmailAttachmentImageRepresentation("sample.msg");
